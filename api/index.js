@@ -4,19 +4,21 @@ const mongoose = require("mongoose");
 mongoose.set("strictQuery", true);
 const User = require("./models/User.js");
 const bcrypt = require("bcryptjs");
-const jwt = require('jsonwebtoken');
+const jwt = require("jsonwebtoken");
+const cookieParser = require("cookie-parser");
 require("dotenv").config();
 const app = express();
 
 const bcryptSalt = bcrypt.genSaltSync(10);
-const jwtSecret = 'ifweyg32ygyfv873bugsvf82vfegvwed2';
+const jwtSecret = "ifweyg32ygyfv873bugsvf82vfegvwed2";
 
 app.use(express.json());
+app.use(cookieParser());
 
 app.use(
   cors({
     origin: "http://localhost:5173",
-    credentials:true,   
+    credentials: true,
   })
 );
 
@@ -76,28 +78,48 @@ app.post("/register", async (req, res) => {
   }
 });
 
-app.post('/login', async(req, res) => {
-  const {email, password} = req.body;
+app.post("/login", async (req, res) => {
+  const { email, password } = req.body;
   try {
-    const userDoc = await User.findOne({email});
-    if(userDoc) {
+    const userDoc = await User.findOne({ email });
+    if (userDoc) {
       // res.json('found');
       const passOk = bcrypt.compareSync(password, userDoc.password);
-      if(passOk) {
-        jwt.sign({email:userDoc.email, id:userDoc._id}, jwtSecret, {}, (err, token) => {
-          if(err) throw err;
-          res.cookie('token', token).json('pass okay');
-        })
-      }else {
-        res.status(422).json('pass not okay');
+      if (passOk) {
+        jwt.sign(
+          {
+            email: userDoc.email,
+            id: userDoc._id,
+          },
+          jwtSecret,
+          {},
+          (err, token) => {
+            if (err) throw err;
+            res.cookie("token", token).json(userDoc);
+          }
+        );
+      } else {
+        res.status(422).json("pass not okay");
       }
-    }else {
-      res.status(422).json('not found');
+    } else {
+      res.status(422).json("not found");
     }
-  } catch(e) {}
+  } catch (e) {}
 });
 
-
+app.get("/profile", (req, res) => {
+  const { token } = req.cookies;
+  if (token) {
+    jwt.verify(token, jwtSecret, {}, async (err, userData) => {
+      if (err) throw err;
+      const {firstName, lastName, email, id} = await User.findById(userData.id);
+      res.json({firstName, lastName, email, id});
+    });
+  } else {
+    res.json(null);
+  }
+  // res.json(token);
+});
 
 // connectDB();
 app.listen(4000, () => {
