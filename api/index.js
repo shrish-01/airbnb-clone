@@ -121,6 +121,10 @@ app.get("/profile", (req, res) => {
   // res.json(token);
 });
 
+app.post('/logout', (req,res) => {
+  res.cookie('token', '').json(true);
+});
+
 // connectDB();
 app.listen(4000, () => {
   console.log("listing at 4000");
