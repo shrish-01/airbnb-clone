@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 const mongoose = require('mongoose');
 
 const placeSchema = new mongoose.Schema({
@@ -6,7 +7,7 @@ const placeSchema = new mongoose.Schema({
   address: String,
   photos: [String],
   description: String,
-  perks: [Strings],
+  perks: [String],
   extraInfo: String,
   checkIn: Number,
   checkOut: Number,

@@ -1,3 +1,5 @@
+// import PropTypes from 'prop-types'; // Import PropTypes
+
 export default function Perks({selected, onchange}) {
   function handleCheckBoxClick(ev) {
     const {checked, name} = ev.target;
@@ -54,3 +56,8 @@ export default function Perks({selected, onchange}) {
     </>
   )
 }
+
+// Perks.propTypes = {
+//   selected: PropTypes.array.isRequired, // Specify the type as an array and mark it as required
+//   onchange: PropTypes.func.isRequired, // You can specify the expected type for onChange as well
+// };
