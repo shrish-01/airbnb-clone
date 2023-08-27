@@ -14,6 +14,7 @@ const fs = require('fs');
 require("dotenv").config();
 const app = express();
 
+// eslint-disable-next-line no-unused-vars
 const bcryptSalt = bcrypt.genSaltSync(10);
 const jwtSecret = "ifweyg32ygyfv873bugsvf82vfegvwed2";
 
@@ -39,6 +40,7 @@ mongoose.connect("mongodb://localhost:27017/booking-app");
 //     .catch((error) => console.log(error.message));
 // };
 // TEST GET
+
 app.get("/test", (req, res) => {
   res.json("tested");
 });
@@ -110,7 +112,7 @@ app.post("/login", async (req, res) => {
     } else {
       res.status(422).json("not found");
     }
-  } catch (e) {}
+  } catch (e) { /* empty */ }
 });
 
 app.get("/profile", (req, res) => {
