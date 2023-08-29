@@ -2,7 +2,6 @@ import { useState } from "react";
 import axios from 'axios';
 import PropTypes from 'prop-types'; // Import PropTypes
 
-
 export default function PhotosUploader({ addedPhotos, onChange }) {
 
     const [photoLink, setPhotoLink] = useState('');

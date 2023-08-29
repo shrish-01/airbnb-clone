@@ -55,18 +55,52 @@ app.get("/users", async (req, res) => {
   }
 });
 
-// app.post('/register', async (req, res) => {
-//   const {firstName, lastName, email, password} = req.body;
+app.get("/profile", (req, res) => {
+  const { token } = req.cookies;
+  if (token) {
+    jwt.verify(token, jwtSecret, {}, async (err, userData) => {
+      if (err) throw err;
+      const {firstName, lastName, email, id} = await User.findById(userData.id);
+      res.json({firstName, lastName, email, id});
+    });
+  } else {
+    res.json(null);
+  }
+  // res.json(token);
+});
 
-//   const userDoc = await User.create({
-//     firstName,
-//     lastName,
-//     email,
-//     password:bcrypt.hashSync(password, bcryptSalt),
-//   });
+app.get('/places', (req, res) => {
+  const { token } = req.cookies;
+  jwt.verify(token, jwtSecret, {}, async (err, userData) => {
+    const {id} = userData;
+    res.json( await Place.find({owner: id}) )
+  });
+});
 
-//   res.json(userDoc);
-// })
+app.get('/places/:id', async (req, res) => {
+  const {id} = req.params;
+  res.json(await Place.findById(id));
+});
+
+app.put('/places', async (req, res) => {
+  const { token } = req.cookies;
+  const { id, title, address, addedPhotos, description, 
+    perks, extraInfo, checkIn, checkOut, maxGuests,
+  } = req.body;
+  
+  jwt.verify(token, jwtSecret, {}, async (err, userData) => {
+    const placeDoc = await Place.findById(id);
+    if(userData.id === placeDoc.owner.toString()) {
+      placeDoc.set({
+        title, address, photos:addedPhotos, description, 
+      perks, extraInfo, checkIn, checkOut, maxGuests,
+      })
+      await placeDoc.save();
+      res.json('ok');
+    }
+  });
+
+});
 
 app.post("/register", async (req, res) => {
   const { firstName, lastName, email, password } = req.body;
@@ -115,20 +149,6 @@ app.post("/login", async (req, res) => {
   } catch (e) { /* empty */ }
 });
 
-app.get("/profile", (req, res) => {
-  const { token } = req.cookies;
-  if (token) {
-    jwt.verify(token, jwtSecret, {}, async (err, userData) => {
-      if (err) throw err;
-      const {firstName, lastName, email, id} = await User.findById(userData.id);
-      res.json({firstName, lastName, email, id});
-    });
-  } else {
-    res.json(null);
-  }
-  // res.json(token);
-});
-
 app.post('/logout', (req,res) => {
   res.cookie('token', '').json(true);
 });
@@ -169,7 +189,7 @@ app.post('/places', (req, res) => {
     if (err) throw err;
     const placeDoc = await Place.create({
       owner: userData.id,
-      title, address, addedPhotos, description, 
+      title, address, photos:addedPhotos, description, 
     perks, extraInfo, checkIn, checkOut, maxGuests,
     });
     res.json(placeDoc);
