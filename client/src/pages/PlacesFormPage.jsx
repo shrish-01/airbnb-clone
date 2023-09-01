@@ -19,6 +19,7 @@ export default function PlacesFormPage() {
     const [checkIn, setCheckIn] = useState("");
     const [checkOut, setCheckOut] = useState("");
     const [maxGuests, setMaxGuests] = useState(1);
+    const [price, setPrice] = useState(100);
     const [redirect, setRedirect] = useState(false);
 
     useEffect(() => {
@@ -36,6 +37,7 @@ export default function PlacesFormPage() {
             setCheckIn(data.checkIn);
             setCheckOut(data.checkOut);
             setMaxGuests(data.maxGuests);
+            setPrice(data.price);
         });
     }, [id]);
 
@@ -61,7 +63,7 @@ export default function PlacesFormPage() {
         const placeData = {
             title, address, addedPhotos,
             description, perks, extraInfo,
-            checkIn, checkOut, maxGuests
+            checkIn, checkOut, maxGuests, price
         }
         if (id) {
             // Update
@@ -132,7 +134,7 @@ export default function PlacesFormPage() {
                 />
                 {/* CheckIN & CheckOUT & MAX-GUESTS */}
                 {preInput("Check-in & out.", "User, should not miss!")}
-                <div className="grid gap-2 sm:grid-cols-3">
+                <div className="grid gap-2 grid-cols-2 md:grid-cols-4">
                     <div>
                         <h3 className="mt-2 -mb-1">Check-in time</h3>
                         <input
@@ -156,6 +158,15 @@ export default function PlacesFormPage() {
                         <input
                             value={maxGuests}
                             onChange={(ev) => setMaxGuests(ev.target.value)}
+                            type="text"
+                            placeholder="7"
+                        />
+                    </div>
+                    <div>
+                        <h3 className="mt-2 -mb-1">Price/Night</h3>
+                        <input
+                            value={price}
+                            onChange={(ev) => setPrice(ev.target.value)}
                             type="text"
                             placeholder="7"
                         />

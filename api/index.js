@@ -31,16 +31,6 @@ app.use(
 
 mongoose.connect("mongodb://localhost:27017/booking-app");
 
-// const connectDB = async () => {
-//   await mongoose
-//     .connect('mongodb+srv://ursvedantyetekar:RbC4g1LnUE4MIpNR@cluster0.gunksbu.mongodb.net/?retryWrites=true&w=majority')
-//     .then(() => {
-//       console.log("Database connection successful.");
-//     })
-//     .catch((error) => console.log(error.message));
-// };
-// TEST GET
-
 app.get("/test", (req, res) => {
   res.json("tested");
 });
@@ -69,7 +59,7 @@ app.get("/profile", (req, res) => {
   // res.json(token);
 });
 
-app.get('/places', (req, res) => {
+app.get('/user-places', (req, res) => {
   const { token } = req.cookies;
   jwt.verify(token, jwtSecret, {}, async (err, userData) => {
     const {id} = userData;
@@ -82,10 +72,14 @@ app.get('/places/:id', async (req, res) => {
   res.json(await Place.findById(id));
 });
 
+app.get('/places', async (req, res) => {
+  res.json( await Place.find() );
+});
+
 app.put('/places', async (req, res) => {
   const { token } = req.cookies;
   const { id, title, address, addedPhotos, description, 
-    perks, extraInfo, checkIn, checkOut, maxGuests,
+    perks, extraInfo, checkIn, checkOut, maxGuests, price,
   } = req.body;
   
   jwt.verify(token, jwtSecret, {}, async (err, userData) => {
@@ -93,7 +87,7 @@ app.put('/places', async (req, res) => {
     if(userData.id === placeDoc.owner.toString()) {
       placeDoc.set({
         title, address, photos:addedPhotos, description, 
-      perks, extraInfo, checkIn, checkOut, maxGuests,
+      perks, extraInfo, checkIn, checkOut, maxGuests,price,
       })
       await placeDoc.save();
       res.json('ok');
@@ -183,14 +177,14 @@ app.post('/upload', photosMiddleware.array('photos', 100), (req, res) => {
 app.post('/places', (req, res) => {
   const { token } = req.cookies;
   const { title, address, addedPhotos, description, 
-    perks, extraInfo, checkIn, checkOut, maxGuests,
+    perks, extraInfo, checkIn, checkOut, maxGuests, price,
   } = req.body;
   jwt.verify(token, jwtSecret, {}, async (err, userData) => {
     if (err) throw err;
     const placeDoc = await Place.create({
       owner: userData.id,
       title, address, photos:addedPhotos, description, 
-    perks, extraInfo, checkIn, checkOut, maxGuests,
+    perks, extraInfo, checkIn, checkOut, maxGuests,price,
     });
     res.json(placeDoc);
   });
